@@ -19,12 +19,9 @@ for i, arr in enumerate(data):
     # Plot spectrogram
     plt.figure(figsize=(10, 6))
     plt.pcolormesh(t, f, 10 * np.log10(Sxx), shading='gouraud')
-    plt.title('Spectrogram')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [sec]')
-    plt.colorbar(label='Power/Frequency [dB/Hz]')
+    plt.axis('off')  # Turn off axis labels
     plt.tight_layout()
-    plt.savefig(os.path.join(save_folder, f"spectrogram_{i}.png"))
+    plt.savefig(os.path.join(save_folder, f"spectrogram_{i}.png"), bbox_inches='tight', pad_inches=0)
     plt.close()
     # put into tensor
 
