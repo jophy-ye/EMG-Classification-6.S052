@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.nn import init
 import torch.nn.functional as F
 from torch.nn import init
+import torch.optim as optim
 import re
 
 
@@ -101,3 +102,25 @@ myModel = myModel.to(device)
 next(myModel.parameters()).device
 
 criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(myModel.parameters(), lr=0.01)
+
+input_tensors = []  # List of tensors, each one has dim (num_channels, height, width), length of list is 124 patients
+labels = []  # List of true labels
+
+# Concatenate the input tensors along the channel dimension
+
+for ix in range(len(input_tensors)):
+    input_tensor = input_tensors[ix]
+    # Forward pass
+    output = myModel(input_tensor) # dim is 1x2 (2 classes DF/KE)
+
+    # Compute the loss
+    loss = criterion(output, labels[ix])
+
+    # Backward pass: Compute gradients
+    optimizer.zero_grad()
+    loss.backward()
+
+    # Update weights
+    optimizer.step()
+
