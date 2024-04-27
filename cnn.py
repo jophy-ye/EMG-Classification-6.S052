@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.nn import init
 import torch.nn.functional as F
 from torch.nn import init
+import re
 
 
 # ----------------------------
@@ -16,11 +17,13 @@ def parse_labels(filename):
     with open(output_file_path, "w") as file:
         for line in lines:
         # Write the text content to the file
-            text_content = ""
-            text_content += line[1:3] + " "
-            text_content += line[4:6] + " "
-            text_content += line[7:9] + "\n"
-            file.write(text_content)
+            output = ""
+            text_content = re.split(r'[_.]', line)
+            output += text_content[0][1:] + " "
+            output += text_content[1] + " " 
+            output += text_content[2] + " "
+            output += "\n"
+            file.write(output)
 
 
 class AudioClassifier (nn.Module):
