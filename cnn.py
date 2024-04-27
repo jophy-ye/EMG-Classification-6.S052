@@ -1,3 +1,6 @@
+import torch
+import torch.nn as nn
+from torch.nn import init
 import torch.nn.functional as F
 from torch.nn import init
 
@@ -5,6 +8,21 @@ from torch.nn import init
 # ----------------------------
 # Audio Classification Model
 # ----------------------------
+def parse_labels(filename):
+    output_file_path = "output.txt"
+    with open(f"{filename}.txt", "r") as file:
+    # Read all lines into a list
+        lines = file.readlines()
+    with open(output_file_path, "w") as file:
+        for line in lines:
+        # Write the text content to the file
+            text_content = ""
+            text_content += line[1:3] + " "
+            text_content += line[4:6] + " "
+            text_content += line[7:9] + "\n"
+            file.write(text_content)
+
+
 class AudioClassifier (nn.Module):
     # Build the model architecture
     def __init__(self):
@@ -78,3 +96,5 @@ device = torch.device(device)
 myModel = myModel.to(device)
 # Check that it is on Cuda
 next(myModel.parameters()).device
+
+criterion = nn.CrossEntropyLoss()
