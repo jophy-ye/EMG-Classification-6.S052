@@ -108,19 +108,20 @@ input_tensors = []  # List of tensors, each one has dim (num_channels, height, w
 labels = []  # List of true labels
 
 # Concatenate the input tensors along the channel dimension
+num_epochs = 2000
+for epoch in range(num_epochs):
+    for ix in range(len(input_tensors)):
+        input_tensor = input_tensors[ix]
+        # Forward pass
+        output = myModel(input_tensor)
 
-for ix in range(len(input_tensors)):
-    input_tensor = input_tensors[ix]
-    # Forward pass
-    output = myModel(input_tensor) # dim is 1x2 (2 classes DF/KE)
+        # Compute the loss
+        loss = criterion(output, labels[ix])
 
-    # Compute the loss
-    loss = criterion(output, labels[ix])
+        # Backward pass: Compute gradients
+        optimizer.zero_grad()
+        loss.backward()
 
-    # Backward pass: Compute gradients
-    optimizer.zero_grad()
-    loss.backward()
-
-    # Update weights
-    optimizer.step()
+        # Update weights
+        optimizer.step()
 
