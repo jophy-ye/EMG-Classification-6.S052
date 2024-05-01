@@ -31,9 +31,10 @@ class Spectrogram:
                 plt.savefig(os.path.join(SAVE_FOLDER, f"spectrogram_{i}.png"),
                             bbox_inches='tight', pad_inches=0)
             plt.close()
+    
 
 
-from load_data import Signal
-sig = Signal("S1_10_DF.otb%2B_decomp.mat_edited.mat")
-a = Spectrogram(sig.data)
-a.plot(save=True)
+# from load_data import Signal
+# sig = Signal("S1_10_DF.otb%2B_decomp.mat_edited.mat")
+# a = Spectrogram(sig.data)
+# a.plot(save=True)

@@ -5,11 +5,15 @@ import torch.nn.functional as F
 from torch.nn import init
 import torch.optim as optim
 import re
-
+from dataset import EMGDataset, data_transform
 
 # ----------------------------
 # Audio Classification Model
 # ----------------------------
+# should have 
+# X = 129
+# Y = 532 
+# as input layer
 class AudioClassifier (nn.Module):
     # Build the model architecture
     def __init__(self):
@@ -83,6 +87,10 @@ device = torch.device(device)
 myModel = myModel.to(device)
 # Check that it is on Cuda
 next(myModel.parameters()).device
+# load a pretrained ResNet model
+
+train_dataset = EMGDataset('emg_dataset', mode="train", transform=data_transform['train'])
+val_dataset = EMGDataset('emg_dataset', mode="test", transform=data_transform['test'])
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(myModel.parameters(), lr=0.01)
