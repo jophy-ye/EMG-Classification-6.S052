@@ -10,23 +10,6 @@ import re
 # ----------------------------
 # Audio Classification Model
 # ----------------------------
-def parse_labels(filename):
-    output_file_path = "output.txt"
-    with open(f"{filename}.txt", "r") as file:
-    # Read all lines into a list
-        lines = file.readlines()
-    with open(output_file_path, "w") as file:
-        for line in lines:
-        # Write the text content to the file
-            output = ""
-            text_content = re.split(r'[_.]', line)
-            output += text_content[0][1:] + " "
-            output += text_content[1] + " " 
-            output += text_content[2] + " "
-            output += "\n"
-            file.write(output)
-
-
 class AudioClassifier (nn.Module):
     # Build the model architecture
     def __init__(self):
