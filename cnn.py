@@ -6,6 +6,7 @@ from torch.nn import init
 import torch.optim as optim
 import re
 from dataset import EMGDataset, data_transform
+from tqdm import tqdm
 
 # ----------------------------
 # Audio Classification Model
@@ -100,7 +101,7 @@ labels = []  # List of true labels
 
 # Concatenate the input tensors along the channel dimension
 num_epochs = 2000
-for epoch in range(num_epochs):
+for epoch in tqdm(range(num_epochs)):
     for ix in range(len(input_tensors)):
         input_tensor = input_tensors[ix]
         # Forward pass
