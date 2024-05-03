@@ -1,4 +1,4 @@
-from torch.utils.data import Dataloader, Dataset
+from torch.utils.data import  Dataset
 import torch
 import numpy as np
 from scipy.signal import spectrogram
@@ -26,8 +26,9 @@ class EMGDataset(Dataset):
 
         with open(TESTTRAIN_SPLIT[mode], "r") as f:
             for emg_file in f:
+                emg_file = os.path.join(directory, emg_file.strip())
                 self.emg_samples.append(Signal(emg_file).data)
-                self.labels.append(Label(os.path.basename(emg_file).task))
+                self.labels.append(int(Label(os.path.basename(emg_file)).task == 'DF')) #'DF'(1) and 'KE'(0)
 
     def __len__(self):
         return len(self.emg_samples)
@@ -37,7 +38,7 @@ class EMGDataset(Dataset):
         if self.transform:
             for fn in self.transform:
                 emg_sample = fn(emg_sample)
-        spectogram = torch.tensor(emg_sample) # Note: maybe set datatype=torch.double (using datatype from output of spectrogram (dtype('float64')))
+        spectogram = torch.tensor(emg_sample, dtype=torch.float32) # Note: maybe set datatype=torch.double (using datatype from output of spectrogram (dtype('float64')))
         label = self.labels[idx]
         
         return spectogram, label
