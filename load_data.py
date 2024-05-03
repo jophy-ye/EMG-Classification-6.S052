@@ -6,14 +6,17 @@ import re
 import mat73
 
 class Signal:
-    def __init__(self, filepath):
-        try: 
-            self.mat = scipy.io.loadmat(filepath) #104 files
+    def __init__(self, filepath, format="mat"):
+        if format == "mat":
+            try: 
+                self.mat = scipy.io.loadmat(filepath) #104 files
+                self.signal = self.mat['signal']
+                self.mat['signal'] = {'data': self.signal["data"].item()}
+            except:
+                self.mat = mat73.loadmat(filepath) #20 files with extra meta data
             self.signal = self.mat['signal']
-            self.mat['signal'] = {'data': self.signal["data"].item()}
-        except:
-            self.mat = mat73.loadmat(filepath) #20 files with extra meta data
-        self.signal = self.mat['signal']
+        else:
+            self.signal = {'data': np.load(filepath)}
 
     
     @property

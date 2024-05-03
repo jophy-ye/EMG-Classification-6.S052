@@ -14,7 +14,7 @@ X = 129
 Y = 532
 TESTTRAIN_SPLIT = {"train": "train_files.txt", "test": "test_files.txt"}
 class EMGDataset(Dataset):
-    def __init__(self, directory, mode="train", transform=None):
+    def __init__(self, directory, format = "mat", mode="train", transform=None):
         """
         mode: "train" or "test"
         transfrom: apply transformation on emg_sample to transfrom to spectogram (last function must transfrom it to a spectogram)
@@ -27,7 +27,7 @@ class EMGDataset(Dataset):
         with open(TESTTRAIN_SPLIT[mode], "r") as f:
             for emg_file in f:
                 emg_file = os.path.join(directory, emg_file.strip())
-                self.emg_samples.append(Signal(emg_file).data)
+                self.emg_samples.append(Signal(emg_file, format=format).data)
                 self.labels.append(int(Label(os.path.basename(emg_file)).task == 'DF')) #'DF'(1) and 'KE'(0)
 
     def __len__(self):
