@@ -40,7 +40,7 @@ if __name__ == '__main__':
     os.makedirs(losses_directory, exist_ok=True)
 
     # this is a model file to load
-    loadfile = os.join(modelweights_directory, f"03-05-24-10_54__epoch_{999}__parameters_task_full.pt") #"03-05-24-08_00__parameters_task_full.pt"#"parameters_task.pt"
+    loadfile = os.path.join(modelweights_directory, f"03-05-24-10_54__epoch_{999}__parameters_task_full.pt") #"03-05-24-08_00__parameters_task_full.pt"#"parameters_task.pt"
 
     if loadfile:
         checkpoint = torch.load(loadfile)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     # weightfiles.append(f"03-05-24-10_54__epoch_{999}__parameters_task_full.pt")
     # print(weightfiles)
     # for weightfile in weightfiles:
-    #     checkpoint = torch.load(os.join(modelweights_directory, weightfile))
+    #     checkpoint = torch.load(os.path.join(modelweights_directory, weightfile))
     #     #model.load_state_dict(checkpoint)
     #     model.load_state_dict(checkpoint['model_state_dict'])
     #     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])

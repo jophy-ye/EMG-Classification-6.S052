@@ -145,8 +145,8 @@ def train(trainDataLoader = trainDataLoader, model = model, criterion = criterio
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': loss,
-                }, os.join(modelweights_directory, f"{datetime_string}__epoch_{epoch}__{filename}"))
-    with open(os.join(losses_directory, f"{datetime_string}__losses.txt"), "w") as f:
+                }, os.path.join(modelweights_directory, f"{datetime_string}__epoch_{epoch}__{filename}"))
+    with open(os.path.join(losses_directory, f"{datetime_string}__losses.txt"), "w") as f:
         f.write(f"{losses}")
     #print(moving_average(losses, 3))
     torch.save({
@@ -154,7 +154,7 @@ def train(trainDataLoader = trainDataLoader, model = model, criterion = criterio
     'model_state_dict': model.state_dict(),
     'optimizer_state_dict': optimizer.state_dict(),
     'loss': loss,
-    }, os.join(modelweights_directory, f"{datetime_string}__epoch_{epoch}__{filename}"))
+    }, os.path.join(modelweights_directory, f"{datetime_string}__epoch_{epoch}__{filename}"))
 
 def validate(valDataLoader=valDataLoader, model = model, criterion = criterion, device = device):
     # set the model to evaluation mode
