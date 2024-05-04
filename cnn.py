@@ -3,13 +3,9 @@ import torch.nn as nn
 from torch.nn import init
 import torch.nn.functional as F
 from torch.nn import init
-import torch.optim as optim
-import re
-from dataset import EMGDataset, data_transform
-from torch.utils.data import DataLoader
 from tqdm import tqdm
 from datetime import datetime
-
+import os
 
 # ----------------------------
 # Audio Classification Model
@@ -83,38 +79,20 @@ class AudioClassifier(nn.Module):
         return x
 
 
-#train_dataset = EMGDataset('emg_dataset', mode="train", transform=data_transform['train'])
-#val_dataset = EMGDataset('emg_dataset', mode="test", transform=data_transform['test'])
-
-train_dataset = EMGDataset('np_emg_dataset', format="np", mode="train")
-val_dataset = EMGDataset('np_emg_dataset', format="np", mode="test")
-batchsize = 32
-trainDataLoader = DataLoader(train_dataset, batch_size=batchsize, shuffle=True)#, num_workers=20, pin_memory=True)
-valDataLoader = DataLoader(val_dataset, batch_size=batchsize, shuffle=False)#, num_workers=20, pin_memory=True)
-
-# Create the model and put it on the GPU if available
-model = AudioClassifier()
-device = (
-    "cuda:0" if torch.cuda.is_available()
-    else "mps" if torch.backends.mps.is_available()
-    else "cpu"
-)
-device = torch.device(device)
-model = model.to(device)
-# Check that it is on Cuda
-next(model.parameters()).device
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01)
-
-
-# Concatenate the input tensors along the channel dimension
-
-
 import numpy as np
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
-def train(num_epochs):
+trainDataLoader = None
+valDataLoader = None
+model = None
+criterion = None
+optimizer =None
+num_epochs = None
+device = None
+losses_directory = None
+modelweights_directory = None
+def train(trainDataLoader = trainDataLoader, model = model, criterion = criterion, optimizer = optimizer, num_epochs = num_epochs, start_epoch = 0, epoch_stamp=100, device=device, losses_directory= losses_directory, modelweights_directory=modelweights_directory):
     # set the model to train mode
     model.train()
     losses = []
@@ -123,8 +101,10 @@ def train(num_epochs):
     running_count = 0
     total_count = 0
 
-    filename = datetime.now().strftime('%d-%m-%y-%H_%M__parameters_task.pt')   
-    for epoch in tqdm(range(num_epochs)):
+    datetime_string =  datetime.now().strftime('%d-%m-%y-%H_%M')
+    filename='parameters_task_full.pt'
+      
+    for epoch in tqdm(range(start_epoch, num_epochs)):
         for batch_index, (inputs, labels) in enumerate(trainDataLoader):
             inputs  = inputs.to(device)
             labels = labels.to(device)
@@ -150,8 +130,8 @@ def train(num_epochs):
 
             running_count += inputs.size(0)
             total_count += inputs.size(0)
-            # print every 50 mini-batches
-            if batch_index % 50 == 49:
+            # print every 2 mini-batches
+            if batch_index % 2 == 1:
                 print('[%d, %5d] avg batch loss: %.3f avg epoch loss: %.3f' %
                     (epoch + 1, batch_index + 1, running_loss / running_count, total_loss / total_count))
                 running_loss = 0.0
@@ -159,23 +139,24 @@ def train(num_epochs):
         losses.append(loss.item())
         if epoch % 20 == 0:
             print(f'On epoch {epoch}: loss={losses[-1]}')
-        if epoch % 200 == 0:    # save periodically
+        if epoch >0 and epoch % epoch_stamp == 0:    # save periodically
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': loss,
-                }, filename)
-    print(losses)
-    print(moving_average(losses, 5))
+                }, os.join(modelweights_directory, f"{datetime_string}__epoch_{epoch}__{filename}"))
+    with open(os.join(losses_directory, f"{datetime_string}__losses.txt"), "w") as f:
+        f.write(f"{losses}")
+    #print(moving_average(losses, 3))
     torch.save({
     'epoch': epoch,
     'model_state_dict': model.state_dict(),
     'optimizer_state_dict': optimizer.state_dict(),
     'loss': loss,
-    }, filename)
+    }, os.join(modelweights_directory, f"{datetime_string}__epoch_{epoch}__{filename}"))
 
-def validate(loadfile=None):
+def validate(valDataLoader=valDataLoader, model = model, criterion = criterion, device = device):
     # set the model to evaluation mode
     
     model.eval()
@@ -214,18 +195,3 @@ def validate(loadfile=None):
     print(f"Evaluation loss: {total_loss / total_count :.3f}")
     print(f'Accuracy of the model on the validation images: {accuracy: .2f}%')
     print()
-
-
-if __name__ == '__main__':
-    num_epochs = 20000    # !!! main adjustable parameter !!!
-    loadfile = None#"parameters_task.pt"
-    if loadfile:
-        checkpoint = torch.load(loadfile)
-        model.load_state_dict(checkpoint)
-        # model.load_state_dict(checkpoint['model_state_dict'])
-        # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        # epoch = checkpoint['epoch']
-        # loss = checkpoint['loss']
-   
-    train(num_epochs=num_epochs)
-    validate()
