@@ -163,7 +163,10 @@ def validate(valDataLoader=valDataLoader, model = model, criterion = criterion, 
     total_loss = 0.0
     total_correct = 0
     total_count = 0
-
+    total_actual  =  np.zeros(0, dtype=int)
+    total_predictions = np.zeros(0, dtype=int)
+    total_losses =  np.zeros(0)
+    total_entropies = np.zeros(0)
     # no need to track gradients for validation
     with torch.no_grad():
         for inputs, labels in valDataLoader:
@@ -173,11 +176,10 @@ def validate(valDataLoader=valDataLoader, model = model, criterion = criterion, 
             outputs = model(inputs)
             # TODO: from your output (which are probabilities for each class, find the predicted
             # class)
-            print(outputs)
+            #print(outputs)
             classifications = torch.argmax(outputs, dim=1)
             loss = criterion(outputs, labels)
             correct_count = 0
-            print(labels)
             for idx, classification in enumerate(classifications):
                 correct_count += classification == labels[idx]
             #correct_count = classifications[classifications == labels]
@@ -187,11 +189,10 @@ def validate(valDataLoader=valDataLoader, model = model, criterion = criterion, 
             total_correct += correct_count
             total_count += labels.size(0)
 
-    accuracy = 100 * total_correct / total_count
-    print(accuracy)
-    print(total_correct)
-    print(total_count)
-    print()
-    print(f"Evaluation loss: {total_loss / total_count :.3f}")
-    print(f'Accuracy of the model on the validation images: {accuracy: .2f}%')
-    print()
+
+            total_actual = np.append(total_actual, labels.detach().cpu().numpy())
+            total_losses =  np.append(total_losses, loss.detach().cpu().numpy())
+            total_predictions =  np.append(total_predictions,classifications.detach().cpu().numpy())
+            total_entropies =  np.append(total_entropies, (-torch.sum(outputs * torch.log(outputs), dim=1)).detach().cpu().numpy())
+
+    return (total_actual, total_predictions, total_entropies, total_losses)

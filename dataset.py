@@ -28,7 +28,7 @@ class EMGDataset(Dataset):
             for emg_file in f:
                 emg_file = os.path.join(directory, emg_file.strip())
                 self.emg_samples.append(Signal(emg_file, format=format).data)
-                self.labels.append(int(Label(os.path.basename(emg_file)).task == 'DF')) #'DF'(1) and 'KE'(0)
+                self.labels.append(label_to_catagorical_variable(Label(os.path.basename(emg_file)).task)) 
 
     def __len__(self):
         return len(self.emg_samples)
@@ -42,6 +42,14 @@ class EMGDataset(Dataset):
         label = self.labels[idx]
         
         return spectogram, label
+def label_to_catagorical_variable(label):
+    """
+    returns 1 if label is 'DF'
+    """
+    return int(label == 'DF')
+
+def catagorical_variable_to_label(catagory):
+    return 'DF' if catagory == 1 else 'KE'
 
 def select_electrodes(dataset):
     electrodes, samples = dataset.shape
