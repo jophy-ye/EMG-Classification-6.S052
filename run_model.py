@@ -1,5 +1,5 @@
 import re
-from dataset import EMGDataset, data_transform
+from dataset import *
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from cnn import *
@@ -37,12 +37,15 @@ def contingency_table(actual, prediction):
     return im
 
 if __name__ == '__main__':
+    data_transform = {'train': [merge_spectograms], 
+                  'test': [merge_spectograms], }
+    batchsize = 32
     #train_dataset = EMGDataset('emg_dataset', mode="train", transform=data_transform['train'])
     #val_dataset = EMGDataset('emg_dataset', mode="test", transform=data_transform['test'])
-    #train_dataset = EMGDataset('np_emg_dataset', format="np", mode="train")
-    val_dataset = EMGDataset('np_emg_dataset', format="np", mode="test")
-    batchsize = 32
+    #train_dataset = EMGDataset('np_emg_dataset', format="np", mode="train",  transform=data_transform['train'])
     #trainDataLoader = DataLoader(train_dataset, batch_size=batchsize, shuffle=True,pin_memory=True) # num_workers=20, 
+    
+    val_dataset = EMGDataset('np_emg_dataset', format="np", mode="test",  transform=data_transform['test'])
     valDataLoader = DataLoader(val_dataset, batch_size=batchsize, shuffle=False,  pin_memory=True) #num_workers=20,
 
     # Create the model and put it on the GPU if available
@@ -62,9 +65,9 @@ if __name__ == '__main__':
 
     # Concatenate the input tensors along the channel dimension
 
-    num_epochs = 10000    # !!! main adjustable parameter !!!
+    num_epochs = 2000    # !!! main adjustable parameter !!!
     start_epoch = 0
-    epoch_stamp = 500 # create model files every this many epoches
+    epoch_stamp = 100 # create model files every this many epoches
     modelweights_directory = "modelweights"
     losses_directory = "losses"
     evalulation_directory = "evaluation"
@@ -86,10 +89,10 @@ if __name__ == '__main__':
     #train(trainDataLoader = trainDataLoader, model = model, criterion = criterion, optimizer = optimizer, num_epochs=num_epochs, start_epoch=start_epoch, epoch_stamp=epoch_stamp, device=device, losses_directory= losses_directory, modelweights_directory=modelweights_directory)
     
     #the following is code to load model files and potentially do something with them
-    weightfiles = [f"03-05-24-10_54__epoch_{epoch}__parameters_task_full.pt" for epoch in range(100, 1000, 100)]
-    weightfiles.append(f"03-05-24-10_54__epoch_{999}__parameters_task_full.pt")
-    weightfiles +=  [f"03-05-24-13_23__epoch_{epoch}__parameters_task_full.pt" for epoch in range(1000, 10000, 500)]
-    weightfiles.append(f"03-05-24-13_23__epoch_{9999}__parameters_task_full.pt")
+    weightfiles = [f"07-05-24-11_36__epoch_{epoch}__parameters_task_full.pt" for epoch in range(100, 2000, 100)]
+    # weightfiles.append(f"07-05-24-10_54__epoch_{999}__parameters_task_full.pt")
+    # weightfiles +=  [f"07-05-24-13_23__epoch_{epoch}__parameters_task_full.pt" for epoch in range(1000, 10000, 500)]
+    weightfiles.append(f"07-05-24-11_36__epoch_{1999}__parameters_task_full.pt")
     #print(weightfiles)
     for weightfile in weightfiles:
         checkpoint = torch.load(os.path.join(modelweights_directory, weightfile))
@@ -111,5 +114,6 @@ if __name__ == '__main__':
         print(f"{accuracy=}, {avg_loss=}")
         
 
-    # validate(valDataLoader = valDataLoader, model=model, criterion = criterion, device=device)
+    #validate(valDataLoader = valDataLoader, model=model, criterion = criterion, device=device)
     # validate(valDataLoader = trainDataLoader, model=model, criterion = criterion, device=device)
+

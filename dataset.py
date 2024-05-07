@@ -42,6 +42,7 @@ class EMGDataset(Dataset):
         label = self.labels[idx]
         
         return spectogram, label
+    
 def label_to_catagorical_variable(label):
     """
     returns 1 if label is 'DF'
@@ -66,6 +67,9 @@ def apply_spectrogram(dataset):
         _, _, sxx = spectrogram(row, fs=2048)
         fin[idx] = sxx
     return fin
+
+def merge_spectograms(spectogram):
+    return np.expand_dims(spectogram.mean(axis=0), 0)
 
 data_transform = {'train': [select_electrodes, pad_data, apply_spectrogram], 
                   'test': [select_electrodes, pad_data, apply_spectrogram], }

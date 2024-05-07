@@ -22,23 +22,23 @@ class AudioClassifier(nn.Module):
         conv_layers = []
 
         # First Convolution Block with Relu and Batch Norm. Use Kaiming Initialization
-        self.conv1 = nn.Conv2d(256, 128, kernel_size=(9, 9), stride=(2, 2), padding=(4, 4))
+        self.conv1 = nn.Conv2d(1, 16, kernel_size=(9, 9), stride=(2, 2), padding=(4, 4))
         self.relu1 = nn.ReLU()
-        self.bn1 = nn.BatchNorm2d(128)
+        self.bn1 = nn.BatchNorm2d(16)
         init.kaiming_normal_(self.conv1.weight, a=0.1)
         self.conv1.bias.data.zero_()
         conv_layers += [self.conv1, self.relu1, self.bn1]
 
         # Second Convolution Block
-        self.conv2 = nn.Conv2d(128, 64, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+        self.conv2 = nn.Conv2d(16, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
         self.relu2 = nn.ReLU()
-        self.bn2 = nn.BatchNorm2d(64)
+        self.bn2 = nn.BatchNorm2d(16)
         init.kaiming_normal_(self.conv2.weight, a=0.1)
         self.conv2.bias.data.zero_()
         conv_layers += [self.conv2, self.relu2, self.bn2]
 
         # Second Convolution Block
-        self.conv3 = nn.Conv2d(64, 32, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+        self.conv3 = nn.Conv2d(16, 32, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
         self.relu3 = nn.ReLU()
         self.bn3 = nn.BatchNorm2d(32)
         init.kaiming_normal_(self.conv3.weight, a=0.1)
@@ -92,7 +92,7 @@ num_epochs = None
 device = None
 losses_directory = None
 modelweights_directory = None
-def train(trainDataLoader = trainDataLoader, model = model, criterion = criterion, optimizer = optimizer, num_epochs = num_epochs, start_epoch = 0, epoch_stamp=100, device=device, losses_directory= losses_directory, modelweights_directory=modelweights_directory):
+def train(trainDataLoader = trainDataLoader, model = model, criterion = criterion, optimizer = optimizer, num_epochs = num_epochs, start_epoch = 0, epoch_stamp=100, device=device, losses_directory= losses_directory, modelweights_directory=modelweights_directory,filename='parameters_task_full.pt'):
     # set the model to train mode
     model.train()
     losses = []
@@ -102,7 +102,6 @@ def train(trainDataLoader = trainDataLoader, model = model, criterion = criterio
     total_count = 0
 
     datetime_string =  datetime.now().strftime('%d-%m-%y-%H_%M')
-    filename='parameters_task_full.pt'
       
     for epoch in tqdm(range(start_epoch, num_epochs)):
         for batch_index, (inputs, labels) in enumerate(trainDataLoader):
